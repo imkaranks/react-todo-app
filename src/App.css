@@ -1,0 +1,8 @@
+.track::after {
+  content: '';
+  position: absolute;
+  z-index: -10;
+  height: .25rem;
+  width: calc(var(--completed) / var(--total) * 100%);
+  background-color: rgb(252 165 165);
+}

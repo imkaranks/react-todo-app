@@ -28,16 +28,23 @@ function reducer(state, action) {
   }
 }
 
-const date = new Date();
 const day = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function newTodo(todo) {
+  const date = new Date();
   return { id: Date.now(), todo, completed: false, time: date.toLocaleTimeString() };
 }
 
 function App() {
-  const [todos, dispatch] = useReducer(reducer, JSON.parse(localStorage.getItem('todos')) || []);
+  const existingTodos = JSON.parse(localStorage.getItem('todos'));
+  const [todos, dispatch] = useReducer(reducer, (existingTodos.length && existingTodos) || [{
+    completed: false,
+    id: 1687111562467,
+    time: "11:36:02 PM",
+    todo: "Hey there👋, Feel free to take quick notes📝"
+  }]);
   const [todo, setTodo] = useState('');
+  const date = new Date();
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -64,11 +71,11 @@ function App() {
       <header>
         <h1 className='text-xl py-4 font-semibold text-center'>Todays Task</h1>
         <div className='flex items-center'>
-          <div className='flex-1'>
-            <time className='text-2xl font-bold'>{day[date.getDay()]} {date.getDate()}</time>
+          <div className='flex-1 grid gap-2'>
+            <time className='text-3xl font-bold'>{day[date.getDay()]} {date.getDate()}</time>
             <p className='text-gray-400'>{todosAmt} task{todosAmt > 1 && 's'} today</p>
           </div>
-          <div className='bg-green-400 flex justify-center items-center w-10 aspect-square rounded-full'>
+          <div className='bg-green-300 shadow-lg shadow-green-200 text-white flex justify-center items-center w-[2.625rem] aspect-square rounded-full'>
             <i className="fa-regular fa-calendar"></i>
           </div>
         </div>
@@ -82,10 +89,10 @@ function App() {
           id='todo'
           value={todo}
           onChange={(ev) => setTodo(ev.target.value)}
-          className='w-full flex-1 px-4 py-2 rounded-full focus:outline-blue-400'
+          className='w-full flex-1 px-4 py-2 rounded-full shadow-lg shadow-black/10 focus:outline-blue-400'
           placeholder='Add Notes...'
         />
-        <button className='h-[2.625rem] aspect-square bg-red-400 rounded-full' type="submit">
+        <button className='h-[2.625rem] aspect-square text-white bg-red-400 rounded-full shadow-lg shadow-red-200 hover:bg-red-300 active:bg-red-300' type="submit">
           <span className="sr-only">Add Todo</span>
           <i className="fa-solid fa-plus"></i>
         </button>
@@ -97,7 +104,7 @@ function App() {
           {" "}
           Out Of {todosAmt} Completed
         </h2>
-        <div className={`track relative ${todosAmt ? 'w-full' : 'w-0'} flex justify-between items-center py-4 before:content-[''] before:absolute before:-z-20 before:w-full before:h-1 before:bg-red-200`} style={styles}>
+        <div className={`track relative ${todosAmt ? 'w-full' : 'w-0'} flex justify-between items-center py-4 before:content-[''] before:absolute before:-z-20 before:w-full before:h-1 before:bg-red-200`} aria-hidden="true" style={styles}>
           <span className='bg-red-400 w-2 aspect-square rounded-full'></span>
           {
             todos.map(todo => (

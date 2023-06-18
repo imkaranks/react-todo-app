@@ -36,7 +36,7 @@ function newTodo(todo) {
 }
 
 function App() {
-  const existingTodos = JSON.parse(localStorage.getItem('todos'));
+  const existingTodos = JSON.parse(localStorage.getItem('todos')) || [];
   const [todos, dispatch] = useReducer(reducer, (existingTodos.length && existingTodos) || [{
     completed: false,
     id: 1687111562467,

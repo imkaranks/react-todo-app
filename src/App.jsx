@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import Todo from './components/Todo';
 import './App.css'
 
 export const ACTIONS = {
   ADD_TODO: "add-todo",
   REMOVE_TODO: "remove-todo",
-  TOGGLE_TODO: "toggle-todo"
+  TOGGLE_TODO: "toggle-todo",
+  EDIT_TODO: "edit-todo"
 }
 
 function reducer(state, action) {
@@ -20,6 +21,13 @@ function reducer(state, action) {
       return state.map(item => {
         if (item.id === action.payload.id) {
           return {...item, completed: !item.completed};
+        }
+        return item;
+      });
+    case ACTIONS.EDIT_TODO:
+      return state.map(item => {
+        if (item.id === action.payload.id) {
+          return { ...item, todo: action.payload.todo };
         }
         return item;
       });
@@ -44,6 +52,11 @@ function App() {
     todo: "Hey there👋, Feel free to take quick notes📝"
   }]);
   const [todo, setTodo] = useState('');
+  const [editMode, setEditMode] = useState({
+    status: false,
+    id: null
+  });
+  const inputRef = useRef(null);
   const date = new Date();
 
   useEffect(() => {
@@ -62,8 +75,26 @@ function App() {
 
   function handleSubmit(ev) {
     ev.preventDefault();
-    dispatch({ type: ACTIONS.ADD_TODO, payload: {todo} })
-    setTodo('');
+    if (editMode.status) {
+      dispatch({ type: ACTIONS.EDIT_TODO, payload: {id: editMode.id, todo} });
+      setEditMode({
+        status: false,
+        id: null
+      });
+      setTodo('')
+    }
+    else if (todo.trim()) {
+      dispatch({ type: ACTIONS.ADD_TODO, payload: {todo} })
+      setTodo('');
+    }
+  }
+
+  function editTodo(id) {
+    inputRef.current.focus();
+    setEditMode({
+      status: true,
+      id
+    });
   }
 
   return (
@@ -91,6 +122,7 @@ function App() {
           onChange={(ev) => setTodo(ev.target.value)}
           className='w-full flex-1 px-4 py-2 rounded-full shadow-lg shadow-black/10 focus:outline-blue-400'
           placeholder='Add Notes...'
+          ref={inputRef}
         />
         <button className='h-[2.625rem] aspect-square text-white bg-red-400 rounded-full shadow-lg shadow-red-200 hover:bg-red-300 active:bg-red-300' type="submit">
           <span className="sr-only">Add Todo</span>
@@ -121,6 +153,7 @@ function App() {
               key={todo.id}
               todo={todo}
               dispatch={dispatch}
+              editTodo={editTodo}
             />
           ))
         }

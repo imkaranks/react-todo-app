@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
+import { motion } from 'framer-motion';
 import Todo from './components/Todo';
 import './App.css'
 
@@ -41,6 +42,17 @@ const day = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', '
 function newTodo(todo) {
   const date = new Date();
   return { id: Date.now(), todo, completed: false, time: date.toLocaleTimeString() };
+}
+
+export const variant = {
+  hide: {
+    opacity: 0,
+    y: -50
+  },
+  show: {
+    opacity: 1,
+    y: 0
+  }
 }
 
 function App() {
@@ -89,8 +101,9 @@ function App() {
     }
   }
 
-  function editTodo(id) {
+  function editTodo(id, todo) {
     inputRef.current.focus();
+    setTodo(todo);
     setEditMode({
       status: true,
       id
@@ -99,20 +112,47 @@ function App() {
 
   return (
     <div className='w-11/12 max-w-4xl mx-auto'>
-      <header>
-        <h1 className='text-xl py-4 font-semibold text-center'>Todays Task</h1>
-        <div className='flex items-center'>
-          <div className='flex-1 grid gap-2'>
+      <motion.header
+        initial="hide"
+        whileInView="show"
+        transition={{type: "spring", staggerChildren: 0.3}}
+        viewport={{once: true}}
+      >
+        <motion.h1
+          className='text-xl py-4 font-semibold text-center'
+          variants={variant}
+        >Todays Task</motion.h1>
+        <motion.div
+          className='flex items-center'
+          initial="hide"
+          whileInView="show"
+          transition={{type: "spring", staggerChildren: 0.3}}
+          viewport={{once: true}}
+        >
+          <motion.div
+            className='flex-1 grid gap-2'
+            variants={variant}
+          >
             <time className='text-3xl font-bold'>{day[date.getDay()]} {date.getDate()}</time>
             <p className='text-gray-400'>{todosAmt} task{todosAmt > 1 && 's'} today</p>
-          </div>
-          <div className='bg-green-300 shadow-lg shadow-green-200 text-white flex justify-center items-center w-[2.625rem] aspect-square rounded-full'>
+          </motion.div>
+          <motion.div
+            className='bg-green-300 shadow-lg shadow-green-200 text-white flex justify-center items-center w-[2.625rem] aspect-square rounded-full'
+            variants={variant}
+          >
             <i className="fa-regular fa-calendar"></i>
-          </div>
-        </div>
-      </header>
+          </motion.div>
+        </motion.div>
+      </motion.header>
 
-      <form className='flex gap-4 my-8' onSubmit={handleSubmit}>
+      <motion.form
+        className='flex gap-4 my-8' onSubmit={handleSubmit}
+        variants={variant}
+        initial="hide"
+        whileInView="show"
+        transition={{type: "spring", delay: 1}}
+        viewport={{once: true}}
+      >
         <label className='sr-only' htmlFor="todo">Add Notes</label>
         <input
           type="text"
@@ -126,24 +166,47 @@ function App() {
         />
         <button className='h-[2.625rem] aspect-square text-white bg-red-400 rounded-full shadow-lg shadow-red-200 hover:bg-red-300 active:bg-red-300' type="submit">
           <span className="sr-only">Add Todo</span>
-          <i className="fa-solid fa-plus"></i>
+          {
+            editMode.status
+            ? <i className="fa-solid fa-edit"></i>
+            : <i className="fa-solid fa-plus"></i>
+          }
         </button>
-      </form>
+      </motion.form>
 
       <section>
-        <h2 className='font-semibold'>
+        <motion.h2
+          className='font-semibold'
+          variants={variant}
+          initial="hide"
+          whileInView="show"
+          viewport={{once: true}}
+          transition={{type: "spring", delay: 1.5}}
+        >
           {completedAmt}
           {" "}
           Out Of {todosAmt} Completed
-        </h2>
-        <div className={`track relative ${todosAmt ? 'w-full' : 'w-0'} flex justify-between items-center py-4 before:content-[''] before:absolute before:-z-20 before:w-full before:h-1 before:bg-red-200`} aria-hidden="true" style={styles}>
-          <span className='bg-red-400 w-2 aspect-square rounded-full'></span>
+        </motion.h2>
+        <motion.div
+          className={`track relative ${todosAmt ? 'w-full' : 'w-0'} flex justify-between items-center py-4 before:content-[''] before:absolute before:-z-20 before:w-full before:h-1 before:bg-red-200`} aria-hidden="true" style={styles}
+          initial="hide"
+          animate="show"
+          transition={{type: "spring", delayChildren: 2, staggerChildren: 0.3}}
+        >
+          <motion.span
+            variants={variant}
+            className='bg-red-400 w-2 aspect-square rounded-full'
+          ></motion.span>
           {
             todos.map(todo => (
-              <span key={todo.id} className='bg-red-400 w-2 aspect-square rounded-full'></span>
+              <motion.span
+                variants={variant}
+                key={todo.id}
+                className='bg-red-400 w-2 aspect-square rounded-full'
+              ></motion.span>
             ))
           }
-        </div>
+        </motion.div>
       </section>
 
       <section className='grid gap-4 sm:gap-6'>
